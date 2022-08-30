@@ -10,10 +10,10 @@ public class RemoveComment {
 
     public static void main(String[] args) throws IOException {
         RemoveComment removeComment= new RemoveComment();
-        removeComment.createUncommentedSourceCode("src/BinarySearchTree.java",1);
+        removeComment.createUncommentedSourceCode("src/BinarySearchTree.java");
     }
 
-    public void createUncommentedSourceCode(String sourceCodePath,int number) throws IOException {
+    public void createUncommentedSourceCode(String sourceCodePath) throws IOException {
         Scanner scanner = new Scanner(System.in);
 
         Path path = Path.of(sourceCodePath);//"src/code.txt");
@@ -22,16 +22,24 @@ public class RemoveComment {
 
         String str = content;//scanner.nextLine();
         String multiCommentRegex = "\\/\\*([\\S\\s]+?)\\*\\/", singleCommentRegex = "(/\\*((.|\n)*?)\\*/)|//.*";
-        String outputFilePath = "src/clean_data"+number+".txt";
-        String result1 = deleteComments(str,multiCommentRegex);
-        String result2 = deleteComments(result1,singleCommentRegex);
-        //System.out.println(result);
+        String outputFilePath = "src/clean_file"+".txt", uncommentedFilePath = "src/uncommented_file"+".txt"  ;
+        String singleCommentRemoved = deleteComments(str,singleCommentRegex);
+        String multiCommentRemoved = deleteComments(singleCommentRemoved,multiCommentRegex);
+        generateFile(uncommentedFilePath,multiCommentRemoved);
+        String newLineRemoved = removeNewLine(uncommentedFilePath);
+        generateFile(outputFilePath,newLineRemoved);
 
+
+
+
+    }
+
+    public void generateFile(String filePath,String fileData){
         BufferedWriter writer = null;
         try
         {
-            writer = new BufferedWriter( new FileWriter( outputFilePath));
-            writer.write( result2);
+            writer = new BufferedWriter( new FileWriter( filePath));
+            writer.write(fileData);
 
         }
         catch ( IOException e)
@@ -44,8 +52,6 @@ public class RemoveComment {
             } catch (IOException e) {
             }
         }
-
-        System.out.println(removeNewLine());
     }
 
 
@@ -64,22 +70,23 @@ public class RemoveComment {
         return newString;
     }
 
-    public static String removeNewLine() throws FileNotFoundException
+    public static String removeNewLine(String filePath) throws FileNotFoundException
     {
-        String str = "";
-        FileInputStream fis=new FileInputStream("src/clean_data1.txt");
+        int i=0;
+        String fileString = "";
+        FileInputStream fis=new FileInputStream(filePath);
         Scanner sc=new Scanner(fis);
         while(sc.hasNextLine())
         {
-            /*if(sc.nextLine().length()>0)
-                str += sc.nextLine();*/
-          //String string = String.valueOf(sc.nextLine());
-           // String line = sc.nextLine();
-            System.out.println(sc.nextLine().length());
+            String str = sc.nextLine();
+            if(!str.isBlank()){
+                i += 1;
+                fileString += str+"\n";
+            }
         }
         sc.close();     //closes the scanner
-
-        return str;
+        System.out.println("LOC = "+i);
+        return fileString;
     }
 }
 
