@@ -9,11 +9,26 @@ import java.util.regex.Pattern;
 public class RemoveComment {
 
     public static void main(String[] args) throws IOException {
-        RemoveComment removeComment= new RemoveComment();
-        removeComment.createUncommentedSourceCode("src/BinarySearchTree.java");
+       createUncommentedSourceCode("src/BinarySearchTree.java");
+        System.out.println("LOC = "+getLOC("src/clean_file.txt"));
     }
 
-    public void createUncommentedSourceCode(String sourceCodePath) throws IOException {
+    public static int getLOC(String filePath) throws FileNotFoundException {
+        int loc = 0;
+        FileInputStream fis=new FileInputStream(filePath);
+        Scanner sc=new Scanner(fis);
+        while(sc.hasNextLine())
+        {
+            String str = sc.nextLine();
+            if(!str.isBlank()){
+                loc += 1;
+            }
+        }
+        sc.close();
+        return loc;
+    }
+
+    public static void createUncommentedSourceCode(String sourceCodePath) throws IOException {
         Scanner scanner = new Scanner(System.in);
 
         Path path = Path.of(sourceCodePath);//"src/code.txt");
@@ -28,13 +43,37 @@ public class RemoveComment {
         generateFile(uncommentedFilePath,multiCommentRemoved);
         String newLineRemoved = removeNewLine(uncommentedFilePath);
         generateFile(outputFilePath,newLineRemoved);
-
-
-
-
     }
 
-    public void generateFile(String filePath,String fileData){
+    public static String deleteComments(String myString,String regex)
+    {
+        String newString = "";
+        Pattern commentaryPattern = Pattern.compile(regex);
+        //Pattern commentaryPattern = Pattern.compile("(/\\*((.|\n)*?)\\*/)|//.*");
+        //Pattern commentaryPattern = Pattern.compile("\\/\\*([\\S\\s]+?)\\*\\/");
+        Matcher m = commentaryPattern.matcher(myString);
+        newString += m.replaceAll("");
+
+        return newString;
+    }
+
+    public static String removeNewLine(String filePath) throws FileNotFoundException
+    {
+        String fileString = "";
+        FileInputStream fis=new FileInputStream(filePath);
+        Scanner sc=new Scanner(fis);
+        while(sc.hasNextLine())
+        {
+            String str = sc.nextLine();
+            if(!str.isBlank()){
+                fileString += str+"\n";
+            }
+        }
+        sc.close();
+        return fileString;
+    }
+
+    public static void generateFile(String filePath,String fileData){
         BufferedWriter writer = null;
         try
         {
@@ -52,41 +91,6 @@ public class RemoveComment {
             } catch (IOException e) {
             }
         }
-    }
-
-
-
-    public static String deleteComments(String myString,String regex)
-    {
-        String newString = "";
-
-        Pattern commentaryPattern = Pattern.compile(regex);
-        //Pattern commentaryPattern = Pattern.compile("(/\\*((.|\n)*?)\\*/)|//.*");
-        //Pattern commentaryPattern = Pattern.compile("\\/\\*([\\S\\s]+?)\\*\\/");
-
-        Matcher m = commentaryPattern.matcher(myString);
-        newString += m.replaceAll("");
-
-        return newString;
-    }
-
-    public static String removeNewLine(String filePath) throws FileNotFoundException
-    {
-        int i=0;
-        String fileString = "";
-        FileInputStream fis=new FileInputStream(filePath);
-        Scanner sc=new Scanner(fis);
-        while(sc.hasNextLine())
-        {
-            String str = sc.nextLine();
-            if(!str.isBlank()){
-                i += 1;
-                fileString += str+"\n";
-            }
-        }
-        sc.close();     //closes the scanner
-        System.out.println("LOC = "+i);
-        return fileString;
     }
 }
 

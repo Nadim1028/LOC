@@ -6,6 +6,7 @@ class BinarySearchTree {
         {
             key = item;
             left = right = null;
+
         }
     }
     Node root;
